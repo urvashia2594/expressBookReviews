@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios');
 
 public_users.post("/register", (req,res) => {
     const username = req.body.username;
@@ -28,6 +29,14 @@ public_users.get('/',function (req, res) {
   return res.status(200).json({ books });
 });
 
+function getBooks()
+{
+    axios.get('http://localhost:5001/')
+    .then(response => console.log("response is:" ,response.data))
+    .catch(error => console.log("Error during fetch book", error.message));
+}
+// getBooks();
+
 // Get book details based on ISBN
 public_users.get('/isbn/:isbn',function (req, res) {
   const isbn = req.params.isbn;
@@ -49,6 +58,15 @@ public_users.get('/isbn/:isbn',function (req, res) {
     return res.status(404).json({"Message": "Book Not Found"});
   }
  });
+
+function getBooksByIsbn()
+{
+    axios.get('http://localhost:5001/isbn/1234')
+    .then(response => console.log("Book base on isbn is:" ,response.data))
+    .catch(error => console.log("Error during fetch book by isbn", error.message));
+}
+// getBooksByIsbn();
+
   
 // Get book details based on author
 public_users.get('/author/:author',function (req, res) {
@@ -71,6 +89,19 @@ public_users.get('/author/:author',function (req, res) {
   
 });
 
+
+async function getBooksByAuthor()
+{
+    try{
+        const response = await axios.get('http://localhost:5001/author/Unknown');
+        console.log("Book base on author is:" ,response.data )
+
+    }catch(error){
+        console.log("Error during fetch book by author", error.message)
+    }
+}
+// getBooksByAuthor();
+
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
   const title = req.params.title;
@@ -89,6 +120,18 @@ public_users.get('/title/:title',function (req, res) {
   }
   return res.status(404).json({message: "Book not found"});
 });
+
+async function getBooksByTitle()
+{
+    try{
+        const response = await axios.get('http://localhost:5001/title/Things Fall Apart');
+        console.log("Book base on title is:" ,response.data )
+
+    }catch(error){
+        console.log("Error during fetch book by title", error.message)
+    }
+}
+getBooksByTitle();
 
 //  Get book review
 public_users.get('/review/:isbn',function (req, res) {
